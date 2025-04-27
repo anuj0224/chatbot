@@ -1,5 +1,6 @@
 const axios = require('axios');
 const Chat = require('../models/saveResponse');
+const knowledgeBase = require('../utils/knowledge');
 
 const sendMessageToAI = async (req, res) => {
   const { question,userId } = req.body;
@@ -13,9 +14,13 @@ const sendMessageToAI = async (req, res) => {
       "https://openrouter.ai/api/v1/chat/completions",
       {
         model: "nvidia/llama-3.1-nemotron-nano-8b-v1:free",
-        messages: [{ role: "user", content: question }],
-        temperature: 0.7,   
-        max_tokens: 200,
+        messages: [
+            { role: "system", content: `Use the following information to help answer:\n${knowledgeBase}` },
+            { role: "user", content: question }
+          ],
+  
+        temperature: 0.2,   
+        max_tokens: 100,
       },
       {
         headers: {
